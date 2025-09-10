@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coming Soon - Swadesh Foils Ltd</title>
+    <style>
+        /* 
+        Developer Notes:
+        - Company name color: CMYK C100 M20 Y0 K0 ≈ #00CCFF
+        - Link color: #14BF98
+        - Replace images in the CAROUSEL_IMAGES array below
+        - Adjust launch date in data-launch attribute on countdown element
+        - Autoplay interval and melt duration configurable in JavaScript section
+        */
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            overflow-x: hidden;
+            background: #000;
+        }
+        
+        .hero {
+            position: relative;
+            height: 100vh;
+            overflow: hidden;
+        }
+        
+        .carousel-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+        
+        .carousel-slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-size: cover;
+            background-position: center;
+            opacity: 0;
+            transition: opacity 2s ease-in-out;
+            will-change: transform, opacity;
+        }
+        
+        .carousel-slide.active {
+            opacity: 1;
+        }
+        
+        .carousel-slide::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.6));
+            z-index: 1;
+        }
+        
+        .carousel-controls {
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 12px;
+            z-index: 10;
+        }
+        
+        .carousel-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.3);
+            border: 2px solid rgba(255,255,255,0.5);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .carousel-dot.active {
+            background: #00CCFF;
+            border-color: #00CCFF;
+        }
+        
+        .carousel-arrow {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(0,0,0,0.5);
+            color: white;
+            border: none;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 18px;
+            z-index: 10;
+            transition: background 0.3s ease;
+        }
+        
+        .carousel-arrow:hover {
+            background: rgba(0,0,0,0.8);
+        }
+        
+        .carousel-arrow.prev {
+            left: 30px;
+        }
+        
+        .carousel-arrow.next {
+            right: 30px;
+        }
+        
+        .hero-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            color: white;
+            z-index: 5;
+        }
+        
+        .hero-label {
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 20px;
+            opacity: 0.8;
+        }
+        
+        .hero-label::before,
+        .hero-label::after {
+            content: '';
+            display: inline-block;
+            width: 40px;
+            height: 1px;
+            background: #00CCFF;
+            vertical-align: middle;
+            margin: 0 15px;
+        }
+        
+        .hero-title {
+            font-size: clamp(3rem, 8vw, 6rem);
+            font-weight: 700;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+        }
+        
+        .company-name {
+            /* CMYK C100 M20 Y0 K0 ≈ #00CCFF */
+            color: #00CCFF;
+            font-size: clamp(1.8rem, 5vw, 2.8rem);
+            font-weight: 600;
+            margin-bottom: 40px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+        }
+        
+        .countdown-container {
+            margin-top: 40px;
+        }
+        
+        .countdown {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            flex-wrap: wrap;
+        }
+        
+        .countdown-item {
+            text-align: center;
+            background: rgba(0,0,0,0.6);
+            padding: 20px 15px;
+            border-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.1);
+            min-width: 80px;
+        }
+        
+        .countdown-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            display: block;
+            color: #00CCFF;
+        }
+        
+        .countdown-label {
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 5px;
+            opacity: 0.8;
+        }
+        
+        .footer {
+            background: rgba(0,0,0,0.9);
+            color: white;
+            padding: 40px 20px;
+            text-align: center;
+        }
+        
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            align-items: center;
+        }
+        
+        .footer-section h3 {
+            color: #00CCFF;
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+        }
+        
+        .footer-section p,
+        .footer-section a {
+            margin: 8px 0;
+            color: rgba(255,255,255,0.8);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+        
+        .footer-section a {
+            color: #14BF98;
+        }
+        
+        .footer-section a:hover {
+            color: #00CCFF;
+        }
+        
+        .social-links {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 15px;
+        }
+        
+        .social-link {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            background: rgba(20, 191, 152, 0.2);
+            border: 2px solid #14BF98;
+            border-radius: 50%;
+            color: #14BF98;
+            font-size: 18px;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+        
+        .social-link:hover {
+            background: #14BF98;
+            color: white;
+        }
+        
+        .noscript-fallback {
+            display: none;
+        }
+        
+        /* Print styles */
+        @media print {
+            .carousel-container,
+            .carousel-controls,
+            .carousel-arrow {
+                display: none !important;
+            }
+            
+            .hero {
+                background: #000;
+                color: white;
+            }
+            
+            * {
+                animation: none !important;
+                transition: none !important;
+            }
+        }
+        
+        /* Reduced motion */
+        @media (prefers-reduced-motion: reduce) {
+            .carousel-slide {
+                transition: opacity 0.5s ease;
+            }
+            
+            * {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+        
+        /* Mobile styles */
+        @media (max-width: 768px) {
+            .countdown {
+                gap: 15px;
+            }
+            
+            .countdown-item {
+                padding: 15px 10px;
+                min-width: 70px;
+            }
+            
+            .countdown-number {
+                font-size: 2rem;
+            }
+            
+            .carousel-arrow {
+                width: 40px;
+                height: 40px;
+                font-size: 14px;
+            }
+            
+            .carousel-arrow.prev {
+                left: 15px;
+            }
+            
+            .carousel-arrow.next {
+                right: 15px;
+            }
+            
+            .footer-content {
+                grid-template-columns: 1fr;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- No-JavaScript fallback -->
+    <noscript>
+        <div class="noscript-fallback" style="display: block;">
+            <div class="hero" style="background: url('attached_assets/generated_images/Dark_factory_interior_photo_83f42dba.png') center/cover;">
+                <div class="hero-content">
+                    <div class="hero-label">Industrial Excellence</div>
+                    <h1 class="hero-title">Coming Soon</h1>
+                    <div class="company-name">Swadesh Foils Ltd</div>
+                    <p style="font-size: 1.2rem; margin-top: 30px;">Launch Date: 2025-12-01</p>
+                </div>
+            </div>
+        </div>
+    </noscript>
+
+    <div class="hero">
+        <!-- Carousel container -->
+        <div class="carousel-container" id="carousel">
+            <!-- Slides will be dynamically generated -->
+        </div>
+        
+        <!-- Navigation arrows -->
+        <button class="carousel-arrow prev" id="prevBtn" aria-label="Previous image">‹</button>
+        <button class="carousel-arrow next" id="nextBtn" aria-label="Next image">›</button>
+        
+        <!-- Dot indicators -->
+        <div class="carousel-controls" id="carouselDots">
+            <!-- Dots will be dynamically generated -->
+        </div>
+        
+        <!-- Hero content overlay -->
+        <div class="hero-content">
+            <div class="hero-label">Industrial Excellence</div>
+            <h1 class="hero-title">Coming Soon</h1>
+            <div class="company-name">Swadesh Foils Ltd</div>
+            
+            <!-- Countdown Timer -->
+            <div class="countdown-container">
+                <div class="countdown" id="countdown" data-launch="2025-12-01T12:00:00Z" aria-live="polite">
+                    <div class="countdown-item">
+                        <span class="countdown-number" id="days" aria-label="Days remaining">00</span>
+                        <div class="countdown-label">Days</div>
+                    </div>
+                    <div class="countdown-item">
+                        <span class="countdown-number" id="hours" aria-label="Hours remaining">00</span>
+                        <div class="countdown-label">Hours</div>
+                    </div>
+                    <div class="countdown-item">
+                        <span class="countdown-number" id="minutes" aria-label="Minutes remaining">00</span>
+                        <div class="countdown-label">Minutes</div>
+                    </div>
+                    <div class="countdown-item">
+                        <span class="countdown-number" id="seconds" aria-label="Seconds remaining">00</span>
+                        <div class="countdown-label">Seconds</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>Developer</h3>
+                <p><a href="https://dxel.net" target="_blank" rel="noopener noreferrer" aria-label="Visit DXEL Network website">DXEL Network</a></p>
+            </div>
+            
+            <div class="footer-section">
+                <h3>Contact</h3>
+                <p><a href="mailto:hello@dxel.net" aria-label="Send email to hello@dxel.net">hello@dxel.net</a></p>
+                <p><a href="tel:+13476691213" aria-label="Call +1 347 669 1213">+1 (347) 669-1213</a></p>
+                <p>New York, United States</p>
+            </div>
+            
+            <div class="footer-section">
+                <h3>Follow Us</h3>
+                <div class="social-links">
+                    <a href="https://x.com/dxelnetwork" target="_blank" rel="noopener noreferrer" class="social-link" aria-label="Follow us on Twitter/X">
+                        <span style="font-weight: bold;">𝕏</span>
+                    </a>
+                    <a href="https://github.com/dxelnetwork/" target="_blank" rel="noopener noreferrer" class="social-link" aria-label="Visit our GitHub">
+                        <span>⚡</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Configuration - Easy to modify
+        const CONFIG = {
+            // Image replacement: Update this array with your factory images
+            CAROUSEL_IMAGES: [
+                'attached_assets/generated_images/Dark_factory_interior_photo_83f42dba.png',
+                'attached_assets/generated_images/Night_factory_production_floor_509b08de.png',
+                'attached_assets/generated_images/Factory_warehouse_perspective_ebb6a12f.png'
+            ],
+            AUTOPLAY_INTERVAL: 5000, // 5 seconds
+            MELT_DURATION: 2000, // 2 seconds for crossfade
+            PARALLAX_STRENGTH: 0.5
+        };
+
+        // Carousel functionality
+        class ParallaxCarousel {
+            constructor() {
+                this.currentSlide = 0;
+                this.isPlaying = true;
+                this.autoplayTimer = null;
+                this.slides = [];
+                this.dots = [];
+                
+                this.init();
+            }
+            
+            init() {
+                this.createSlides();
+                this.createDots();
+                this.bindEvents();
+                this.startAutoplay();
+                this.setupParallax();
+            }
+            
+            createSlides() {
+                const carousel = document.getElementById('carousel');
+                
+                CONFIG.CAROUSEL_IMAGES.forEach((image, index) => {
+                    const slide = document.createElement('div');
+                    slide.className = `carousel-slide ${index === 0 ? 'active' : ''}`;
+                    slide.style.backgroundImage = `url('${image}')`;
+                    slide.setAttribute('data-slide', index);
+                    carousel.appendChild(slide);
+                    this.slides.push(slide);
+                });
+            }
+            
+            createDots() {
+                const dotsContainer = document.getElementById('carouselDots');
+                
+                CONFIG.CAROUSEL_IMAGES.forEach((_, index) => {
+                    const dot = document.createElement('button');
+                    dot.className = `carousel-dot ${index === 0 ? 'active' : ''}`;
+                    dot.setAttribute('aria-label', `Go to slide ${index + 1}`);
+                    dot.addEventListener('click', () => this.goToSlide(index));
+                    dotsContainer.appendChild(dot);
+                    this.dots.push(dot);
+                });
+            }
+            
+            bindEvents() {
+                // Arrow navigation
+                document.getElementById('prevBtn').addEventListener('click', () => this.prevSlide());
+                document.getElementById('nextBtn').addEventListener('click', () => this.nextSlide());
+                
+                // Keyboard navigation
+                document.addEventListener('keydown', (e) => {
+                    if (e.key === 'ArrowLeft') this.prevSlide();
+                    if (e.key === 'ArrowRight') this.nextSlide();
+                    if (e.key === ' ') {
+                        e.preventDefault();
+                        this.toggleAutoplay();
+                    }
+                });
+                
+                // Pause on hover
+                const hero = document.querySelector('.hero');
+                hero.addEventListener('mouseenter', () => this.pauseAutoplay());
+                hero.addEventListener('mouseleave', () => this.resumeAutoplay());
+                
+                // Pause on focus
+                hero.addEventListener('focusin', () => this.pauseAutoplay());
+                hero.addEventListener('focusout', () => this.resumeAutoplay());
+            }
+            
+            setupParallax() {
+                // Reduced motion check
+                if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                    return;
+                }
+                
+                window.addEventListener('scroll', () => {
+                    const scrolled = window.pageYOffset;
+                    const parallax = scrolled * CONFIG.PARALLAX_STRENGTH;
+                    
+                    this.slides.forEach(slide => {
+                        slide.style.transform = `translate3d(0, ${parallax}px, 0)`;
+                    });
+                });
+                
+                // Mouse move parallax
+                document.addEventListener('mousemove', (e) => {
+                    const x = (e.clientX / window.innerWidth) * 2 - 1;
+                    const y = (e.clientY / window.innerHeight) * 2 - 1;
+                    
+                    this.slides.forEach(slide => {
+                        const translateX = x * 10;
+                        const translateY = y * 10;
+                        slide.style.transform = `translate3d(${translateX}px, ${translateY}px, 0)`;
+                    });
+                });
+            }
+            
+            goToSlide(index) {
+                if (index === this.currentSlide) return;
+                
+                // Remove active classes
+                this.slides[this.currentSlide].classList.remove('active');
+                this.dots[this.currentSlide].classList.remove('active');
+                
+                // Add active classes
+                this.currentSlide = index;
+                this.slides[this.currentSlide].classList.add('active');
+                this.dots[this.currentSlide].classList.add('active');
+                
+                this.resetAutoplay();
+            }
+            
+            nextSlide() {
+                const next = (this.currentSlide + 1) % this.slides.length;
+                this.goToSlide(next);
+            }
+            
+            prevSlide() {
+                const prev = (this.currentSlide - 1 + this.slides.length) % this.slides.length;
+                this.goToSlide(prev);
+            }
+            
+            startAutoplay() {
+                if (!this.isPlaying) return;
+                
+                this.autoplayTimer = setInterval(() => {
+                    this.nextSlide();
+                }, CONFIG.AUTOPLAY_INTERVAL);
+            }
+            
+            pauseAutoplay() {
+                clearInterval(this.autoplayTimer);
+            }
+            
+            resumeAutoplay() {
+                if (this.isPlaying) {
+                    this.startAutoplay();
+                }
+            }
+            
+            toggleAutoplay() {
+                this.isPlaying = !this.isPlaying;
+                if (this.isPlaying) {
+                    this.startAutoplay();
+                } else {
+                    this.pauseAutoplay();
+                }
+            }
+            
+            resetAutoplay() {
+                this.pauseAutoplay();
+                if (this.isPlaying) {
+                    this.startAutoplay();
+                }
+            }
+        }
+
+        // Countdown Timer
+        class CountdownTimer {
+            constructor() {
+                this.countdownElement = document.getElementById('countdown');
+                this.targetDate = new Date(this.countdownElement.getAttribute('data-launch'));
+                this.timer = null;
+                
+                this.init();
+            }
+            
+            init() {
+                this.updateCountdown();
+                this.timer = setInterval(() => this.updateCountdown(), 1000);
+            }
+            
+            updateCountdown() {
+                const now = new Date().getTime();
+                const distance = this.targetDate.getTime() - now;
+                
+                if (distance < 0) {
+                    this.countdownElement.innerHTML = '<div class="countdown-item"><span class="countdown-number">🚀</span><div class="countdown-label">Launched!</div></div>';
+                    clearInterval(this.timer);
+                    return;
+                }
+                
+                const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+                
+                document.getElementById('days').textContent = String(days).padStart(2, '0');
+                document.getElementById('hours').textContent = String(hours).padStart(2, '0');
+                document.getElementById('minutes').textContent = String(minutes).padStart(2, '0');
+                document.getElementById('seconds').textContent = String(seconds).padStart(2, '0');
+            }
+        }
+
+        // Initialize when DOM is loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            // Hide noscript fallback
+            const noscriptFallback = document.querySelector('.noscript-fallback');
+            if (noscriptFallback) {
+                noscriptFallback.style.display = 'none';
+            }
+            
+            // Initialize components
+            new ParallaxCarousel();
+            new CountdownTimer();
+        });
+
+        // Service Worker for offline functionality (optional)
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function() {
+                navigator.serviceWorker.register('/sw.js').catch(function() {
+                    // Service worker registration failed - no problem for this implementation
+                });
+            });
+        }
+    </script>
+</body>
+</html>

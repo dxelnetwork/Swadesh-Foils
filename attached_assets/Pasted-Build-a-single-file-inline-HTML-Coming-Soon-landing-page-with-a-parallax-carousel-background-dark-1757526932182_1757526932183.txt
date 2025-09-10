@@ -1,0 +1,56 @@
+Build a single-file inline HTML "Coming Soon" landing page with a parallax carousel background (dark factory photos). Requirements:
+
+1. File & deliverable
+   - Single HTML file (no build step). All CSS and JS inline or in <style> / <script> blocks.
+   - Lightweight, responsive and mobile-first. No external frameworks required (vanilla JS + CSS).
+   - Accessible (semantic HTML, ARIA labels, keyboard navigation).
+
+2. Visual & UX
+   - Full-viewport hero with a parallax carousel of dark, atmospheric factory photos (use AI-generated attractive images). Replace any placeholder/current photo with these AI-generated photos.
+   - Carousel behavior:
+     • Parallax depth effect on scroll and mouse move.
+     • Smooth "melt" crossfade transition between slides (a slow, soft dissolve that looks like melting).
+     • Autoplay with configurable interval, pause on hover/focus, arrow navigation, and dot indicators.
+     • Subtle motion performance optimizations (will-change, transform: translate3d).
+   - Overlay: centered vertical stack with:
+     • Top: small label or line (optional decorative divider).
+     • Big heading: "Coming Soon"
+     • Under the heading, company name: "Swadesh Foils Ltd"
+         - Text color: CMYK C100 M20 Y0 K0 (approx. hex #00CCFF). Use the CMYK note in comments.
+         - Increase company name font-size noticeably (desktop ~2.5rem or larger), responsive scaling on smaller screens.
+     • Countdown timer (days : hours : minutes : seconds) with clear labels, accessible to screen readers.
+   - Typography: choose a clean geometric sans-serif (system stack or Google font fallback). Make headings bold and legible.
+   - Color accents:
+     • Link color for all footer/social links: #14BF98.
+     • Ensure sufficient contrast for text over dark photos (use semi-opaque overlay gradient if needed).
+
+3. Footer content (left-aligned or centered as design dictates)
+   - Developer: DXEL Network — link to https://dxel.net (open in new tab)
+   - Contact email: hello@dxel.net (mailto:)
+   - Phone: +1 (347) 669-1213 (tel:)
+   - Address: New York, United States
+   - Social icons: Twitter (X) https://x.com/dxelnetwork and GitHub https://github.com/dxelnetwork/ — icons should be visible and follow the link color #14BF98.
+   - Footer should be responsive, accessible, and include aria-labels for contact items.
+
+4. Imagery & replacement
+   - Use AI-generated dark factory photos for carousel background. Provide a clear mechanism in the code to replace current photo(s) easily (data attributes or a single array of image URLs).
+   - Smoothly replace current main photo with the AI-generated one using the melt crossfade animation on load if a different photo is present.
+
+5. Behavior & extras
+   - Countdown target: allow a placeholder target date (e.g., data-launch="2025-12-01T12:00:00Z") so I can change it easily.
+   - Graceful fallback: if JS disabled, show static "Coming Soon — launch date: YYYY-MM-DD" and a fallback background image.
+   - CSS-only print-friendly styles (hide animation).
+   - Small script to handle live countdown, pause/resume carousel, keyboard left/right for navigation, and reduced-motion respect (`prefers-reduced-motion`).
+
+6. Developer notes/comments in the HTML
+   - Include an inline comment that C100 M20 Y0 K0 ≈ #00CCFF and that color can be adjusted.
+   - Add usage comments for replacing images and adjusting launch date, autoplay interval, and melt duration.
+
+7. Deliverable example structure (in the single file)
+   - <!doctype html>
+   - <head> meta, title, responsive meta tag, minimal inline CSS -->
+   - <body> hero with carousel, overlay content, countdown, footer
+   - inline <script> for carousel, countdown, accessibility handlers
+   - Inline comments showing where to replace AI images and settings.
+
+Make the design dark, modern, minimal, and professional — focused on an industrial aesthetic for "Swadesh Foils Ltd". Ensure all links open in new tabs, and use #14BF98 for link color and #00CCFF (C100 M20 Y0 K0) for the company name text. Provide fully working code in the single HTML file so I can drop it on a server and it works immediately.
